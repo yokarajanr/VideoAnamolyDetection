@@ -1,0 +1,40 @@
+# ── Core Framework ─────────────────────────────────────────────────────────────
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+websockets==12.0
+python-multipart==0.0.9
+python-dotenv==1.0.1
+
+# ── Object Detection ────────────────────────────────────────────────────────────
+ultralytics==8.2.27
+opencv-python==4.10.0.84
+Pillow==10.3.0
+numpy==1.26.4
+
+# ── Vision Language Model ───────────────────────────────────────────────────────
+google-generativeai==0.7.2
+
+# ── RAG / Memory Layer ──────────────────────────────────────────────────────────
+chromadb==0.5.0
+sentence-transformers==3.0.1
+groq==0.9.0
+
+# ── Voice Alerts ────────────────────────────────────────────────────────────────
+pyttsx3==2.90
+
+# ── Data / Utilities ────────────────────────────────────────────────────────────
+pydantic==2.7.3
+httpx==0.27.0
+aiofiles==23.2.1
+python-jose==3.3.0
+
+# ── Academic Evaluation ─────────────────────────────────────────────────────────
+scikit-learn==1.9.0
+matplotlib==3.11.0
+seaborn==0.13.2
+pandas==3.0.3
+tqdm==4.68.4
+
+# ── Database ────────────────────────────────────────────────────────────────────
+motor==3.7.1
+pymongo==4.18.0

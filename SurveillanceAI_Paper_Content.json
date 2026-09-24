@@ -1,0 +1,104 @@
+{
+  "project_title": "A Hybrid YOLO-VLM-RAG Framework for Real-Time Anomaly Detection and Context-Aware Surveillance",
+  "abstract": "Traditional surveillance systems rely heavily on human monitoring or basic motion detection, which are prone to fatigue and high false-positive rates. While modern computer vision models like YOLO have improved real-time object detection, they lack the cognitive ability to understand complex behavioral contexts, such as distinguishing between a person holding a tool versus a weapon in a threatening manner. This paper proposes a novel Hybrid YOLO-VLM-RAG Surveillance Platform that bridges the gap between fast, localized object detection and deep, contextual scene understanding. The framework integrates YOLOv11m for high-speed primary detection (weapons, fire, persons), a Vision-Language Model (Gemini) for explainable behavioral analysis, and Retrieval-Augmented Generation (RAG) with FAISS and MongoDB to maintain temporal event memory. The system is deployed via a real-time FastAPI backend, delivering instant alerts through WebSockets, SMTP Email, and TTS Voice notifications. Our evaluation focuses on predictive accuracy, explainability, latency, and operational usability in real-world security deployments.",
+  "index_terms": [
+    "Anomaly Detection",
+    "Vision-Language Models (VLM)",
+    "YOLO",
+    "Retrieval-Augmented Generation (RAG)",
+    "Explainable AI",
+    "Real-time Surveillance",
+    "Cybersecurity"
+  ],
+  "sections": [
+    {
+      "heading": "I. INTRODUCTION",
+      "content": "Intelligent video surveillance is a critical component of modern physical security infrastructure. Historically, these systems required continuous human observation, which is unscalable and susceptible to human error. The advent of Deep Learning, particularly Convolutional Neural Networks (CNNs), enabled automated object detection and classification in real-time.\n\nHowever, recognizing an object (e.g., a knife) does not necessarily imply a threat. Contextual understanding—such as analyzing body language, intent, and environmental factors—is required to accurately classify an event as an anomaly or a benign action. Traditional object detectors operate as 'black boxes' that output bounding boxes and confidence scores, providing no semantic explanation for their predictions. Security analysts require actionable, explainable insights to initiate emergency response procedures.\n\nTo address these limitations, we propose a Hybrid YOLO-VLM-RAG architecture. This framework combines the micro-second inference speed of YOLO with the deep reasoning capabilities of Vision-Language Models (VLMs) and the long-term memory retrieval of RAG."
+    },
+    {
+      "heading": "II. RELATED WORK",
+      "subsections": [
+        {
+          "subheading": "A. Traditional Surveillance Systems",
+          "content": "Early automated surveillance relied on background subtraction, motion detection, and handcrafted feature extraction (e.g., HOG, SIFT). These methods suffer from environmental sensitivity, struggling with lighting changes, shadows, and occlusions."
+        },
+        {
+          "subheading": "B. Machine Learning-Based Detection",
+          "content": "State-of-the-art surveillance utilizes single-shot detectors like YOLO (You Only Look Once) and SSD. These models achieve real-time processing speeds (30+ FPS) and high accuracy for standard object classes. However, they lack temporal awareness and fail to comprehend complex scenes involving human-object interactions."
+        },
+        {
+          "subheading": "C. Explainable Artificial Intelligence (XAI) in Vision",
+          "content": "Explainable AI (XAI) methods, such as Grad-CAM and SHAP, provide saliency maps indicating which pixels influenced a CNN's decision. While useful for model debugging, these heatmaps do not provide human-readable semantic explanations of why an event is dangerous, which is essential for rapid security decision-making."
+        }
+      ]
+    },
+    {
+      "heading": "III. RESEARCH GAP",
+      "content": "The existing literature provides a strong foundation for object detection, but several limitations remain for practical anomaly detection:\n1. Lack of Semantic Explanations: Bounding boxes and confidence scores do not explain the intent of an actor in a scene.\n2. Absence of Temporal Memory: Most frame-by-frame detectors have zero memory of past events, leading to repetitive alerts for the same ongoing incident.\n3. High Computational Cost of VLMs: Running large multimodal models on every video frame is computationally prohibitive for real-time applications.\n\nTherefore, there is a need for an integrated framework that jointly evaluates high-speed localized detection, semantic explainability, temporal memory, and computational efficiency."
+    },
+    {
+      "heading": "IV. PROPOSED SYSTEM",
+      "subsections": [
+        {
+          "subheading": "A. Overall Architecture",
+          "content": "The proposed framework follows a cascaded, event-driven workflow:\n1. Camera Stream & Frame Extraction: Continuous video input is processed at a fixed framerate.\n2. Primary Detection (YOLOv11m): Extracts bounding boxes and classes (e.g., person, weapon, fire).\n3. Trigger Engine & Zone Manager: Evaluates spatial zones (Restricted/Safe) and detection confidence. If a threshold is met, it triggers the secondary analysis.\n4. Cognitive Analysis (VLM): The triggered frame is sent to a Vision-Language Model (Gemini 1.5/3.6 Flash) for deep behavioral analysis and risk assessment.\n5. Memory Retrieval (RAG): The system compares the current VLM analysis with historical events (FAISS vector store) to provide temporal context.\n6. Alerting System: If the risk is High/Critical, the system fires Voice (TTS) and Email (SMTP) alerts and logs the event to MongoDB."
+        }
+      ]
+    },
+    {
+      "heading": "V. MACHINE LEARNING MODELS",
+      "subsections": [
+        {
+          "subheading": "A. YOLOv11m (Primary Detector)",
+          "content": "YOLOv11m is utilized for its optimal balance between speed (GFLOPs) and mean Average Precision (mAP). It acts as a strict spatial filter, ensuring that computationally expensive VLMs are only invoked when suspicious objects or persons enter restricted zones."
+        },
+        {
+          "subheading": "B. Vision-Language Model (Secondary Brain)",
+          "content": "The VLM (Google Gemini) processes the raw image alongside text prompts containing the YOLO bounding box data. The VLM acts as an Explainability Framework, outputting structured JSON containing: Scene Description, Behavioral Analysis, Detected Activities, Anomalies Found, and Final Risk Level (Low, Medium, High, Critical)."
+        },
+        {
+          "subheading": "C. RAG (Retrieval-Augmented Generation)",
+          "content": "We implement RAG using a SentenceTransformer (e.g., all-MiniLM-L6-v2) to generate embeddings of past VLM event descriptions. These are stored in FAISS (Facebook AI Similarity Search) to allow the VLM to 'remember' if a similar anomaly occurred recently, suppressing redundant alerts."
+        }
+      ]
+    },
+    {
+      "heading": "VI. EXPLAINABILITY FRAMEWORK",
+      "content": "Instead of relying on mathematical feature attribution (like SHAP or Permutation Importance), this system pioneers Semantic Explainability via VLMs. When an anomaly is detected, the VLM generates a human-readable justification. For example, rather than just highlighting a knife, the explanation explicitly states: 'A person is concealing their identity with a helmet indoors and brandishing a knife near the cash register, indicating a high potential for robbery.' This reduces the cognitive load on security operators and provides immediate actionable intelligence."
+    },
+    {
+      "heading": "VII. SYSTEM PERFORMANCE & ROBUSTNESS",
+      "subsections": [
+        {
+          "subheading": "A. Trigger Cooldown Mechanics",
+          "content": "To ensure explanation robustness and prevent API throttling, the Trigger Engine implements a dynamic cooldown. During normal operation, the VLM baseline is updated sparingly. During an active threat, the cooldown is bypassed or reduced, ensuring high-resolution tracking of the anomaly."
+        },
+        {
+          "subheading": "B. Prototype Latency",
+          "content": "The total response time determines whether the proposed detector is practical for real-time intervention. YOLO Inference takes ~15-30 ms per frame (Real-time). VLM API Processing takes ~10-15 seconds (Asynchronous). RAG Retrieval takes ~5-10 ms. By making the VLM call asynchronous, the video stream maintains high FPS without stuttering, while the rich analysis resolves in the background."
+        }
+      ]
+    },
+    {
+      "heading": "VIII. PROTOTYPE IMPLEMENTATION",
+      "subsections": [
+        {
+          "subheading": "A. FastAPI Backend",
+          "content": "The backend is built in Python using FastAPI, handling WebSockets for live video streaming, background tasks for VLM polling, and REST routes for historical event querying."
+        },
+        {
+          "subheading": "B. Frontend Dashboard",
+          "content": "A vanilla JavaScript frontend provides an interactive security console featuring: Live Video Monitor with drawn bounding boxes, Interactive Zone Drawing (Restricted/Safe areas), Real-time Risk Badges and VLM Description Overlays, and an Event History timeline fetched from MongoDB."
+        },
+        {
+          "subheading": "C. Multi-Channel Alerting",
+          "content": "The system implements a connection-resistant SMTP email alert system (using Port 587 and STARTTLS) and a text-to-speech engine (pyttsx3) for immediate physical deterrence."
+        }
+      ]
+    },
+    {
+      "heading": "IX. CONCLUSION & FUTURE WORK",
+      "content": "This paper presents a trustworthy, hybrid artificial intelligence framework for real-time anomaly detection. By cascading YOLO for speed, Gemini for semantic explainability, and FAISS for temporal memory, the system overcomes the limitations of traditional black-box object detectors.\n\nFuture research will focus on adversarial robustness (preventing actors from using adversarial clothing to evade YOLO), integrating audio-based anomaly detection (e.g., glass breaking), and deploying localized open-source VLMs (e.g., LLaVA or Ollama) to remove cloud API dependencies entirely."
+    }
+  ]
+}

@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SurveillanceAI — Hybrid YOLO·VLM·RAG Platform</title>
+  <meta name="description" content="Intelligent AI-powered surveillance platform with real-time anomaly detection, semantic event memory, and natural language querying." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300d4ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z'/></svg>" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ══════════════════════════════════════════════════
+       SIDEBAR
+  ══════════════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <a class="brand-logo" href="#">
+        <div class="brand-icon" style="color:var(--accent)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-eye"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M9 12a3 3 0 1 0 6 0 3 3 0 1 0-6 0"/></svg></div>
+        <div>
+          <div class="brand-name">SurveillanceAI</div>
+        </div>
+      </a>
+      <div class="brand-tagline">AI Surveillance Platform</div>
+    </div>
+
+    <div class="sidebar-status">
+      <div class="status-dot offline" id="conn-dot"></div>
+      <span id="conn-status">Disconnected</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Monitoring</div>
+
+      <a class="nav-item active" id="nav-live" onclick="showPage('live', this)">
+        <span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-video"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg></span>
+        Live Monitor
+      </a>
+
+      <a class="nav-item" id="nav-test-video" onclick="showPage('test-video', this)">
+        <span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-film"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M17 3v18"/><path d="M3 7h18"/><path d="M3 12h18"/><path d="M3 17h18"/></svg></span>
+        Test Video
+      </a>
+
+      <a class="nav-item" id="nav-events" onclick="showPage('events', this)">
+        <span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clipboard-list"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg></span>
+        Event History
+        <span class="nav-badge" id="badge-events">0</span>
+      </a>
+
+      <div class="nav-section-label">Intelligence</div>
+
+      <a class="nav-item" id="nav-rag" onclick="showPage('rag', this)">
+        <span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bot"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></span>
+        Surveillance AI
+      </a>
+
+      <div class="nav-section-label">Configuration</div>
+
+      <a class="nav-item" id="nav-settings" onclick="showPage('settings', this)">
+        <span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>
+        Settings
+      </a>
+
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="system-info" id="system-info">
+        <span id="event-count-sidebar">0 events stored</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════════════════════════════════
+       MAIN CONTENT
+  ══════════════════════════════════════════════════ -->
+  <main class="main-content">
+
+    <!-- Top Bar -->
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topbar-title">Live Monitor</div>
+        <div class="topbar-subtitle" id="topbar-subtitle">Real-time surveillance feed</div>
+      </div>
+      <div class="topbar-actions">
+        <div class="risk-badge low" id="global-risk-badge">
+          <span>●</span> <span id="global-risk-text">LOW</span>
+        </div>
+        <div id="env-badge" class="tag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin" style="vertical-align:-2px; margin-right:4px;"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg><span id="env-name-badge">Office</span></div>
+      </div>
+    </div>
+
+    <!-- ══════ PAGE: LIVE MONITOR ══════ -->
+    <div class="page active" id="page-live">
+
+      <!-- Alert Ticker -->
+      <div class="alerts-ticker" id="alert-ticker">
+        <span class="alert-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-triangle-alert"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span>
+        <span class="alert-text" id="alert-ticker-text">Alert</span>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('alert-ticker').classList.remove('visible')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+      </div>
+
+      <!-- Header Stats (Compact) -->
+      <div class="grid-4 mb-4 stats-compact" id="stats-header">
+        <div class="stat-card">
+          <div class="stat-label">Current Risk</div>
+          <div class="stat-value" id="stat-risk" style="color:var(--risk-low)">LOW</div>
+          <div class="stat-sub">Live assessment</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Events Today</div>
+          <div class="stat-value" id="stat-today">0</div>
+          <div class="stat-sub">anomalies detected</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Detections</div>
+          <div class="stat-value" id="stat-detections">0</div>
+          <div class="stat-sub">objects this session</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">VLM Analyses</div>
+          <div class="stat-value" id="stat-vlm">0</div>
+          <div class="stat-sub">scene analyses</div>
+        </div>
+      </div>
+
+      <!-- Monitor layout -->
+      <div class="monitor-layout">
+
+        <!-- Video panel -->
+        <div class="video-panel">
+          <div class="video-wrapper">
+            <video id="video-source" autoplay muted playsinline style="width:100%;height:100%;object-fit:contain;display:block"></video>
+            <canvas id="live-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
+            <canvas id="live-zone-canvas" style="position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;"></canvas>
+            <div class="live-zone-tools" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(13,17,23,0.9);padding:8px 12px;border-radius:8px;border:1px solid var(--border);display:flex;gap:8px;align-items:center;z-index:10;">
+              <button class="btn btn-ghost btn-sm zone-type-btn active" style="color:var(--risk-high)" onclick="setLiveZoneType('restricted', this)">Restricted</button>
+              <button class="btn btn-ghost btn-sm zone-type-btn" style="color:var(--risk-low)" onclick="setLiveZoneType('safe', this)">Safe</button>
+              <input type="text" id="live-zone-name" placeholder="Zone name..." class="form-control" style="width:120px;height:28px;font-size:12px;background:var(--bg-primary)">
+              <button class="btn btn-secondary btn-sm" onclick="clearLiveZone()" style="height:28px;padding:0 8px">Clear</button>
+            </div>
+            <div class="video-overlay" id="video-overlay">
+              <div class="video-placeholder" id="video-placeholder">
+                <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-video"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg></div>
+                <div style="font-size:15px;font-weight:600;color:var(--text-primary)">Start Camera</div>
+                <div style="font-size:12px">Click "Start Stream" to begin live monitoring</div>
+              </div>
+            </div>
+          </div>
+          <div class="camera-controls">
+            <button class="btn btn-primary" id="btn-start-stream" onclick="startStream()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play" style="vertical-align:-2px; margin-right:4px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>Start Stream</button>
+            <button class="btn btn-secondary hidden" id="btn-stop-stream" onclick="stopStream()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square" style="vertical-align:-2px; margin-right:4px;"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>Stop</button>
+            <select id="camera-select" style="width:auto">
+              <option value="0">Default Camera</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="connectBackend()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link" style="vertical-align:-2px; margin-right:4px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Connect Backend</button>
+            <span style="margin-left:auto;font-size:11px;color:var(--text-muted)" id="fps-counter">0 fps</span>
+          </div>
+
+          <!-- VLM Analysis card (Moved from sidebar) -->
+          <div class="card mt-3">
+            <div class="card-header">
+              <span class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-brain" style="vertical-align:-3px; margin-right:6px;"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/></svg>AI Scene Analysis</span>
+              <span class="tag" id="vlm-status-tag">Waiting</span>
+            </div>
+            <div class="card-body">
+              <div id="vlm-description" style="font-size:13px;color:var(--text-secondary);line-height:1.65;height:90px;overflow-y:auto;padding-right:8px;">
+                No analysis yet. Start the camera stream to begin VLM inference.
+              </div>
+              <div id="vlm-action" class="mt-2" style="font-size:12px;color:var(--text-muted)"></div>
+            </div>
+          </div>
+
+        </div>
+        
+        <!-- Right panel -->
+        <div class="monitor-panel">
+
+          <!-- Detections card -->
+
+          <!-- Removed Anomalies Card -->
+
+          <!-- Detections card -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-box" style="vertical-align:-3px; margin-right:6px;"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>Detections</span>
+            </div>
+            <div class="card-body">
+              <div class="detection-list" id="detection-list">
+                <div style="font-size:12px;color:var(--text-muted);text-align:center;padding:12px">No detections</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent events card -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text" style="vertical-align:-3px; margin-right:6px;"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>Recent Events</span>
+              <button class="btn btn-ghost btn-sm" onclick="showPage('events', document.getElementById('nav-events'))">View All →</button>
+            </div>
+            <div class="card-body">
+              <div class="event-timeline" id="live-timeline">
+                <div style="font-size:12px;color:var(--text-muted);text-align:center;padding:12px">No events yet</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ PAGE: TEST VIDEO ══════ -->
+    <div class="page" id="page-test-video">
+
+      <!-- Alert Ticker -->
+      <div class="alerts-ticker" id="test-alert-ticker">
+        <span class="alert-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-triangle-alert"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span>
+        <span class="alert-text" id="test-alert-ticker-text">Alert</span>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('alert-ticker').classList.remove('visible')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+      </div>
+
+      <!-- Header Stats (Compact) -->
+      <div class="grid-4 mb-4 stats-compact" id="stats-header">
+        <div class="stat-card">
+          <div class="stat-label">Current Risk</div>
+          <div class="stat-value" id="test-stat-risk" style="color:var(--risk-low)">LOW</div>
+          <div class="stat-sub">Live assessment</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Events Today</div>
+          <div class="stat-value" id="test-stat-today">0</div>
+          <div class="stat-sub">anomalies detected</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Detections</div>
+          <div class="stat-value" id="test-stat-detections">0</div>
+          <div class="stat-sub">objects this session</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">VLM Analyses</div>
+          <div class="stat-value" id="test-stat-vlm">0</div>
+          <div class="stat-sub">scene analyses</div>
+        </div>
+      </div>
+
+      <!-- Monitor layout -->
+      <div class="monitor-layout">
+
+        <!-- Video panel -->
+        <div class="video-panel">
+          <div class="video-wrapper">
+            <video id="test-video-source" autoplay muted playsinline style="width:100%;height:100%;object-fit:contain;display:block"></video>
+            <canvas id="test-live-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
+            <canvas id="test-zone-canvas" style="position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;"></canvas>
+            <div class="test-zone-tools" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(13,17,23,0.9);padding:8px 12px;border-radius:8px;border:1px solid var(--border);display:flex;gap:8px;align-items:center;z-index:10;">
+              <button class="zone-type-btn restricted active" onclick="setTestZoneType('restricted', this)" style="padding:4px 8px;font-size:11px">Restricted</button>
+              <button class="zone-type-btn safe" onclick="setTestZoneType('safe', this)" style="padding:4px 8px;font-size:11px">Safe</button>
+              <input type="text" id="test-zone-name" placeholder="Zone name" style="width:100px;font-size:11px;padding:4px 6px" />
+              <button class="btn btn-ghost btn-sm" style="padding:4px 6px" onclick="clearTestZone()">Clear</button>
+            </div>
+
+            <div class="video-overlay" id="test-video-overlay">
+              <div class="video-placeholder" id="test-video-placeholder">
+                <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-video"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg></div>
+                <div style="font-size:15px;font-weight:600;color:var(--text-primary)">Upload Test Video</div>
+                <div style="font-size:12px">Click "Test Video" to upload a local video</div>
+              </div>
+            </div>
+          </div>
+          <div class="camera-controls">
+            <input type="file" id="test-video-upload" accept="video/mp4,video/webm" class="hidden" onchange="handleTestVideoUpload(event)" />
+            <button class="btn btn-secondary" id="btn-upload-test" onclick="document.getElementById('test-video-upload').click()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload" style="vertical-align:-2px; margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>Test Video</button>
+            <button class="btn btn-secondary hidden" id="btn-stop-test-stream" onclick="stopStream()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square" style="vertical-align:-2px; margin-right:4px;"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>Stop</button>
+            <button class="btn btn-secondary btn-sm" onclick="connectBackend()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link" style="vertical-align:-2px; margin-right:4px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Connect Backend</button>
+            <span style="margin-left:auto;font-size:11px;color:var(--text-muted)" id="test-fps-counter">0 fps</span>
+          </div>
+
+          <!-- VLM Analysis card (Moved from sidebar) -->
+          <div class="card mt-3">
+            <div class="card-header">
+              <span class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-brain" style="vertical-align:-3px; margin-right:6px;"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/></svg>AI Scene Analysis</span>
+              <span class="tag" id="test-vlm-status-tag">Waiting</span>
+            </div>
+            <div class="card-body">
+              <div id="test-vlm-description" style="font-size:13px;color:var(--text-secondary);line-height:1.65;height:90px;overflow-y:auto;padding-right:8px;">
+                No analysis yet. Start the camera stream to begin VLM inference.
+              </div>
+              <div id="test-vlm-action" class="mt-2" style="font-size:12px;color:var(--text-muted)"></div>
+            </div>
+          </div>
+
+        </div>
+        
+        <!-- Right panel -->
+        <div class="monitor-panel">
+
+          <!-- Detections card -->
+
+          <!-- Removed Anomalies Card -->
+
+          <!-- Detections card -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-box" style="vertical-align:-3px; margin-right:6px;"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>Detections</span>
+            </div>
+            <div class="card-body">
+              <div class="detection-list" id="test-detection-list">
+                <div style="font-size:12px;color:var(--text-muted);text-align:center;padding:12px">No detections</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent events card -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text" style="vertical-align:-3px; margin-right:6px;"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>Recent Events</span>
+              <button class="btn btn-ghost btn-sm" onclick="showPage('events', document.getElementById('nav-events'))">View All →</button>
+            </div>
+            <div class="card-body">
+              <div class="event-timeline" id="test-live-timeline">
+                <div style="font-size:12px;color:var(--text-muted);text-align:center;padding:12px">No events yet</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ PAGE: EVENT HISTORY ══════ -->
+    <div class="page" id="page-events">
+
+      <!-- Filters -->
+      <div class="card">
+        <div class="card-body">
+          <div class="flex gap-3" style="flex-wrap:wrap">
+            <input type="text" id="filter-search" placeholder="Search events..." style="flex:1;min-width:180px" oninput="filterEvents()" />
+            <select id="filter-risk" onchange="filterEvents()" style="width:150px">
+              <option value="">All Risk Levels</option>
+              <option value="Critical">Critical</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+            <select id="filter-env" onchange="filterEvents()" style="width:150px">
+              <option value="">All Environments</option>
+            </select>
+            <input type="date" id="filter-from" onchange="filterEvents()" style="width:145px" />
+            <input type="date" id="filter-to" onchange="filterEvents()" style="width:145px" />
+            <button class="btn btn-secondary btn-sm" onclick="clearFilters()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> Clear</button>
+            <button class="btn btn-primary btn-sm" onclick="loadEvents()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg> Refresh</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="grid-4">
+        <div class="stat-card">
+          <div class="stat-label">Total Events</div>
+          <div class="stat-value" id="hist-total">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Critical</div>
+          <div class="stat-value" id="hist-critical" style="color:var(--risk-critical)">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">High Risk</div>
+          <div class="stat-value" id="hist-high" style="color:var(--risk-high)">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Anomalies Today</div>
+          <div class="stat-value" id="hist-today">0</div>
+        </div>
+      </div>
+
+      <!-- Events table -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Event Log</span>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary btn-sm" id="btn-delete-selected" onclick="deleteSelectedEvents()" style="display:none;color:var(--risk-high)">
+              Delete Selected
+            </button>
+            <span class="tag" id="events-count-tag">0 events</span>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrapper">
+            <table id="events-table">
+              <thead>
+                <tr>
+                  <th style="width:30px"><input type="checkbox" id="selectAllCheckbox" onchange="toggleAllEvents(this)"></th>
+                  <th>Timestamp</th>
+                  <th>Environment</th>
+                  <th>Event Type</th>
+                  <th>Risk</th>
+                  <th>Objects</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="events-tbody">
+                <tr><td colspan="7">
+                  <div class="empty-state"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clipboard-list"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg></div><p>No events recorded yet.<br/>Start monitoring to capture events.</p></div>
+                </td></tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Pagination -->
+          <div class="flex items-center justify-between" style="padding:12px 20px;border-top:1px solid var(--border)">
+            <span class="text-sm text-muted" id="pagination-info">Showing 0 events</span>
+            <div class="flex gap-2">
+              <button class="btn btn-secondary btn-sm" id="btn-prev" onclick="changePage(-1)" disabled>← Prev</button>
+              <button class="btn btn-secondary btn-sm" id="btn-next" onclick="changePage(1)" disabled>Next →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ PAGE: SURVEILLANCE AI (RAG) ══════ -->
+    <div class="page" id="page-rag">
+
+      <div class="grid-2" style="flex:1;min-height:0;gap:16px;height:calc(100vh - 120px)">
+
+        <!-- Chat panel -->
+        <div class="card" style="display:flex;flex-direction:column;min-height:0">
+          <div class="card-header">
+            <span class="card-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bot"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg> Surveillance AI — RAG Memory Query</span>
+          </div>
+
+          <!-- Preset queries -->
+          <div class="chat-presets" id="preset-chips">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Messages -->
+          <div class="chat-messages" id="chat-messages">
+            <div class="chat-message ai">
+              <div class="chat-avatar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></div>
+              <div class="chat-bubble">
+                Hello! I'm your Surveillance AI assistant with access to your complete event memory.<br/><br/>
+                You can ask me questions like:<br/>
+                • <code>What anomalies occurred today?</code><br/>
+                • <code>Were any weapons detected this week?</code><br/>
+                • <code>Summarize critical events in the laboratory</code><br/><br/>
+                How can I help you analyze your surveillance data?
+              </div>
+            </div>
+          </div>
+
+          <!-- Input -->
+          <div class="chat-input-area">
+            <input
+              type="text"
+              id="chat-input"
+              placeholder="Ask about your surveillance events..."
+              onkeydown="if(event.key==='Enter')sendChatMessage()"
+            />
+            <button class="btn btn-primary" onclick="sendChatMessage()" id="btn-send">
+              <span id="send-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right panel: source events + summary -->
+        <div style="display:flex;flex-direction:column;gap:12px;min-height:0;overflow-y:auto">
+
+          <!-- Daily summary card -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bar-chart-2" style="vertical-align:-3px; margin-right:6px;"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>Daily Summary</span>
+              <button class="btn btn-ghost btn-sm" onclick="loadDailySummary()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg> Refresh</button>
+            </div>
+            <div class="card-body">
+              <div id="daily-summary" style="font-size:13px;color:var(--text-secondary);line-height:1.65">
+                Loading summary...
+              </div>
+            </div>
+          </div>
+
+          <!-- Source events from last query -->
+          <div class="card" style="flex:1">
+            <div class="card-header">
+              <span class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search" style="vertical-align:-2px; margin-right:4px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Retrieved Events</span>
+              <span class="tag" id="retrieved-count">0 events</span>
+            </div>
+            <div class="card-body">
+              <div id="source-events-list" style="display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12px;color:var(--text-muted)">Source events will appear here after your query.</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ PAGE: SETTINGS ══════ -->
+    <div class="page" id="page-settings">
+
+      <div class="grid-2" style="gap:16px">
+
+        <!-- Environment setup -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin" style="vertical-align:-2px; margin-right:4px;"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>Environment</span>
+          </div>
+          <div class="card-body">
+            <p class="text-sm text-muted" style="margin-bottom:16px">
+              Select the surveillance environment. The system will apply environment-specific anomaly rules and risk weights.
+            </p>
+            <div class="env-grid" id="env-grid">
+              <!-- Populated by JS -->
+            </div>
+            <div class="mt-3">
+              <div class="card-title" style="margin-bottom:10px">Current Profile</div>
+              <div id="env-profile-display" style="font-size:12.5px;color:var(--text-secondary);line-height:1.7">
+                Loading...
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Zone configuration -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map" style="vertical-align:-3px; margin-right:6px;"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15"/><path d="M9 3.236v15"/></svg>Zone Configuration</span>
+          </div>
+          <div class="card-body">
+            <p class="text-sm text-muted" style="margin-bottom:12px">
+              Draw zones directly on the camera frame. Click to add points, double-click to close the polygon.
+            </p>
+            <div class="zone-canvas-wrapper">
+              <canvas id="zone-canvas" width="520" height="292"></canvas>
+            </div>
+            <div class="zone-tools mt-2">
+              <button class="zone-type-btn restricted active" id="zone-btn-restricted" onclick="setZoneType('restricted', this)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-alert" style="vertical-align:-2px; margin-right:4px; color: var(--risk-critical)"><circle cx="12" cy="12" r="10"/></svg>Restricted Zone
+              </button>
+              <button class="zone-type-btn safe" id="zone-btn-safe" onclick="setZoneType('safe', this)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check" style="vertical-align:-2px; margin-right:4px; color: var(--risk-low)"><circle cx="12" cy="12" r="10"/></svg>Safe Zone
+              </button>
+              <input type="text" id="zone-name-input" placeholder="Zone name..." style="width:130px" />
+              <button class="btn btn-ghost btn-sm" onclick="clearZoneDrawing()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> Clear</button>
+            </div>
+            <div class="zone-list" id="zone-list">
+              <div style="font-size:12px;color:var(--text-muted)">No zones configured.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System settings -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wrench" style="vertical-align:-3px; margin-right:6px;"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>System Settings</span>
+          </div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:16px">
+
+            <div class="flex items-center justify-between">
+              <div>
+                <div style="font-size:13px;font-weight:500">Voice Alerts</div>
+                <div class="text-xs text-muted">Speak alerts for High & Critical events</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-voice" checked />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div>
+              <div style="font-size:13px;font-weight:500;margin-bottom:6px">YOLO Confidence Threshold</div>
+              <input type="range" id="yolo-threshold" min="20" max="90" value="40" style="padding:0;height:4px;background:var(--bg-glass)" oninput="document.getElementById('yolo-thresh-val').textContent=this.value+'%'" />
+              <div class="text-xs text-muted mt-1">Current: <span id="yolo-thresh-val">40%</span></div>
+            </div>
+
+            <div>
+              <div style="font-size:13px;font-weight:500;margin-bottom:6px">VLM Trigger Sensitivity</div>
+              <select id="vlm-sensitivity">
+                <option value="1">High — Analyze every detection</option>
+                <option value="3" selected>Medium — Analyze high-priority only</option>
+                <option value="5">Low — Analyze sparingly</option>
+              </select>
+            </div>
+
+            <div>
+              <div style="font-size:13px;font-weight:500;margin-bottom:6px">Backend URL</div>
+              <input type="text" id="backend-url" value="ws://localhost:8000" placeholder="ws://localhost:8000" />
+            </div>
+
+            <button class="btn btn-primary w-full" onclick="saveSettings()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-save" style="vertical-align:-2px; margin-right:4px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save Settings</button>
+
+          </div>
+        </div>
+
+        <!-- System health card -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart" style="vertical-align:-3px; margin-right:6px;"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>System Health</span>
+            <button class="btn btn-ghost btn-sm" onclick="checkHealth()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg> Check</button>
+          </div>
+          <div class="card-body">
+            <div id="health-display" style="display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:12px;color:var(--text-muted)">Click "Check" to verify system status.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Event Detail Modal -->
+<div class="modal-overlay" id="event-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Event Detail</span>
+      <span class="modal-close" onclick="closeModal()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+    </div>
+    <div class="modal-body" id="event-modal-body">
+          <div class="card-header">
+            <span class="card-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bot"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg> Surveillance AI — RAG Memory Query</span>
+          </div>
+
+          <!-- Preset queries -->
+          <div class="chat-presets" id="preset-chips">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Messages -->
+          <div class="chat-messages" id="chat-messages">
+            <div class="chat-message ai">
+              <div class="chat-avatar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></div>
+              <div class="chat-bubble">
+                Hello! I'm your Surveillance AI assistant with access to your complete event memory.<br/><br/>
+                You can ask me questions like:<br/>
+                • <code>What anomalies occurred today?</code><br/>
+                • <code>Were any weapons detected this week?</code><br/>
+                • <code>Summarize critical events in the laboratory</code><br/><br/>
+                How can I help you analyze your surveillance data?
+              </div>
+            </div>
+          </div>
+
+          <!-- Input -->
+          <div class="chat-input-area">
+            <input
+              type="text"
+              id="chat-input"
+              placeholder="Ask about your surveillance events..."
+              onkeydown="if(event.key==='Enter')sendChatMessage()"
+            />
+            <button class="btn btn-primary" onclick="sendChatMessage()" id="btn-send">
+              <span id="send-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right panel: source events + summary -->
+        <div style="display:flex;flex-direction:column;gap:12px;min-height:0;overflow-y:auto">
+
+          <!-- Daily summary card -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bar-chart-2" style="vertical-align:-3px; margin-right:6px;"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>Daily Summary</span>
+              <button class="btn btn-ghost btn-sm" onclick="loadDailySummary()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg> Refresh</button>
+            </div>
+            <div class="card-body">
+              <div id="daily-summary" style="font-size:13px;color:var(--text-secondary);line-height:1.65">
+                Loading summary...
+              </div>
+            </div>
+          </div>
+
+          <!-- Source events from last query -->
+          <div class="card" style="flex:1">
+            <div class="card-header">
+              <span class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search" style="vertical-align:-2px; margin-right:4px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Retrieved Events</span>
+              <span class="tag" id="retrieved-count">0 events</span>
+            </div>
+            <div class="card-body">
+              <div id="source-events-list" style="display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12px;color:var(--text-muted)">Source events will appear here after your query.</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ PAGE: SETTINGS ══════ -->
+    <div class="page" id="page-settings">
+
+      <div class="grid-2" style="gap:16px">
+
+        <!-- Environment setup -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin" style="vertical-align:-2px; margin-right:4px;"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>Environment</span>
+          </div>
+          <div class="card-body">
+            <p class="text-sm text-muted" style="margin-bottom:16px">
+              Select the surveillance environment. The system will apply environment-specific anomaly rules and risk weights.
+            </p>
+            <div class="env-grid" id="env-grid">
+              <!-- Populated by JS -->
+            </div>
+            <div class="mt-3">
+              <div class="card-title" style="margin-bottom:10px">Current Profile</div>
+              <div id="env-profile-display" style="font-size:12.5px;color:var(--text-secondary);line-height:1.7">
+                Loading...
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Zone configuration -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map" style="vertical-align:-3px; margin-right:6px;"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15"/><path d="M9 3.236v15"/></svg>Zone Configuration</span>
+          </div>
+          <div class="card-body">
+            <p class="text-sm text-muted" style="margin-bottom:12px">
+              Draw zones directly on the camera frame. Click to add points, double-click to close the polygon.
+            </p>
+            <div class="zone-canvas-wrapper">
+              <canvas id="zone-canvas" width="520" height="292"></canvas>
+            </div>
+            <div class="zone-tools mt-2">
+              <button class="zone-type-btn restricted active" id="zone-btn-restricted" onclick="setZoneType('restricted', this)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-alert" style="vertical-align:-2px; margin-right:4px; color: var(--risk-critical)"><circle cx="12" cy="12" r="10"/></svg>Restricted Zone
+              </button>
+              <button class="zone-type-btn safe" id="zone-btn-safe" onclick="setZoneType('safe', this)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check" style="vertical-align:-2px; margin-right:4px; color: var(--risk-low)"><circle cx="12" cy="12" r="10"/></svg>Safe Zone
+              </button>
+              <input type="text" id="zone-name-input" placeholder="Zone name..." style="width:130px" />
+              <button class="btn btn-ghost btn-sm" onclick="clearZoneDrawing()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> Clear</button>
+            </div>
+            <div class="zone-list" id="zone-list">
+              <div style="font-size:12px;color:var(--text-muted)">No zones configured.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System settings -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wrench" style="vertical-align:-3px; margin-right:6px;"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>System Settings</span>
+          </div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:16px">
+
+            <div class="flex items-center justify-between">
+              <div>
+                <div style="font-size:13px;font-weight:500">Voice Alerts</div>
+                <div class="text-xs text-muted">Speak alerts for High & Critical events</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-voice" checked />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div>
+              <div style="font-size:13px;font-weight:500;margin-bottom:6px">YOLO Confidence Threshold</div>
+              <input type="range" id="yolo-threshold" min="20" max="90" value="40" style="padding:0;height:4px;background:var(--bg-glass)" oninput="document.getElementById('yolo-thresh-val').textContent=this.value+'%'" />
+              <div class="text-xs text-muted mt-1">Current: <span id="yolo-thresh-val">40%</span></div>
+            </div>
+
+            <div>
+              <div style="font-size:13px;font-weight:500;margin-bottom:6px">VLM Trigger Sensitivity</div>
+              <select id="vlm-sensitivity">
+                <option value="1">High — Analyze every detection</option>
+                <option value="3" selected>Medium — Analyze high-priority only</option>
+                <option value="5">Low — Analyze sparingly</option>
+              </select>
+            </div>
+
+            <div>
+              <div style="font-size:13px;font-weight:500;margin-bottom:6px">Backend URL</div>
+              <input type="text" id="backend-url" value="ws://localhost:8000" placeholder="ws://localhost:8000" />
+            </div>
+
+            <button class="btn btn-primary w-full" onclick="saveSettings()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-save" style="vertical-align:-2px; margin-right:4px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save Settings</button>
+
+          </div>
+        </div>
+
+        <!-- System health card -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart" style="vertical-align:-3px; margin-right:6px;"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>System Health</span>
+            <button class="btn btn-ghost btn-sm" onclick="checkHealth()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg> Check</button>
+          </div>
+          <div class="card-body">
+            <div id="health-display" style="display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:12px;color:var(--text-muted)">Click "Check" to verify system status.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Event Detail Modal -->
+<div class="modal-overlay" id="event-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Event Detail</span>
+      <span class="modal-close" onclick="closeModal()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+    </div>
+    <div class="modal-body" id="event-modal-body">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js?v=7"></script>
+<script src="js/stream.js?v=7"></script>
+<script src="js/zone_canvas.js?v=7"></script>
+<script src="js/events.js?v=7"></script>
+<script src="js/rag_chat.js?v=7"></script>
+<script src="app.js?v=8"></script>
+</body>
+</html>
