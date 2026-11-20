@@ -6,13 +6,21 @@
 
 const API = (() => {
   const getBaseUrl = () => {
-    const wsUrl = localStorage.getItem('backend_url') || 'http://localhost:8000';
-    return wsUrl.replace(/^ws/, 'http');
+    const stored = localStorage.getItem('backend_url');
+    if (stored) return stored.replace(/^ws/, 'http');
+    return (window.location.origin && window.location.origin !== 'null' && window.location.origin.startsWith('http'))
+      ? window.location.origin
+      : 'http://localhost:8000';
   };
 
   const getWsUrl = () => {
-    const stored = localStorage.getItem('backend_url') || 'ws://localhost:8000';
-    return stored.replace(/^http/, 'ws');
+    const stored = localStorage.getItem('backend_url');
+    if (stored) return stored.replace(/^http/, 'ws');
+    if (window.location.host) {
+      const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      return `${proto}//${window.location.host}`;
+    }
+    return 'ws://localhost:8000';
   };
 
   async function request(path, options = {}) {

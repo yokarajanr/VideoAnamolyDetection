@@ -169,7 +169,7 @@ function updateEnvBadge(key, displayName) {
 // ── Settings ─────────────────────────────────────────────────────────────────
 
 function loadSettings() {
-  const backendUrl = localStorage.getItem('backend_url') || 'ws://localhost:8000';
+  const backendUrl = localStorage.getItem('backend_url') || (typeof API !== 'undefined' ? API.getWsUrl() : 'ws://localhost:8000');
   const voiceEnabled = localStorage.getItem('voice_enabled') !== 'false';
 
   const urlInput = document.getElementById('backend-url');

@@ -30,8 +30,8 @@ WEAPON_MODEL_ENABLED: bool = os.getenv("WEAPON_MODEL_ENABLED", "true").lower() =
 
 # ── VLM ───────────────────────────────────────────────────────────────────────
 VLM_PROVIDER: str = os.getenv("VLM_PROVIDER", "gemini")
-GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
-GEMINI_FALLBACK_MODEL: str = os.getenv("GEMINI_FALLBACK_MODEL", "gemini-3.5-flash")
+GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-flash-lite-latest")
+GEMINI_FALLBACK_MODEL: str = os.getenv("GEMINI_FALLBACK_MODEL", "gemini-flash-latest")
 VLM_COOLDOWN_SECONDS: float = float(os.getenv("VLM_COOLDOWN_SECONDS", "3.0"))
 OLLAMA_VLM_MODEL: str = os.getenv("OLLAMA_VLM_MODEL", "moondream")
 OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
@@ -55,7 +55,7 @@ DEFAULT_ENVIRONMENT: str = os.getenv("DEFAULT_ENVIRONMENT", "office")
 
 # ── Server ────────────────────────────────────────────────────────────────────
 BACKEND_HOST: str = os.getenv("BACKEND_HOST", "0.0.0.0")
-BACKEND_PORT: int = int(os.getenv("BACKEND_PORT", "8000"))
+BACKEND_PORT: int = int(os.getenv("PORT", os.getenv("BACKEND_PORT", "8000")))
 
 # ── Database ──────────────────────────────────────────────────────────────────
 MONGO_URI: str = os.getenv("MONGO_URI", "")
